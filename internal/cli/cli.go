@@ -32,6 +32,21 @@ type Version struct {
 	Date    string
 }
 
+func (version Version) display() string {
+	line := "infra " + defaultString(version.Version, "dev")
+	var details []string
+	if version.Commit != "" && version.Commit != "unknown" {
+		details = append(details, "commit "+version.Commit)
+	}
+	if version.Date != "" && version.Date != "unknown" {
+		details = append(details, "built "+version.Date)
+	}
+	if len(details) > 0 {
+		line += " (" + strings.Join(details, ", ") + ")"
+	}
+	return line
+}
+
 type Dependencies struct {
 	NetworkKey  func(apiURL, team, mode string) (private, public string, err error)
 	Stdin       io.Reader
@@ -887,10 +902,7 @@ func (command *CLI) link(address string) string {
 }
 
 func (command *CLI) printVersion() {
-	version := defaultString(command.dependencies.Version.Version, "dev")
-	commit := defaultString(command.dependencies.Version.Commit, "unknown")
-	date := defaultString(command.dependencies.Version.Date, "unknown")
-	fmt.Fprintf(command.dependencies.Stdout, "infra %s (commit %s, built %s)\n", version, commit, date)
+	fmt.Fprintln(command.dependencies.Stdout, command.dependencies.Version.display())
 }
 
 func writeJSON(output io.Writer, value any) error {

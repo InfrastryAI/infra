@@ -81,11 +81,7 @@ func (command *CLI) rootCommand() (*cobra.Command, error) {
 
 	version := defaultString(command.dependencies.Version.Version, "dev")
 	root.Version = version
-	root.SetVersionTemplate(fmt.Sprintf("infra %s (commit %s, built %s)\n",
-		version,
-		defaultString(command.dependencies.Version.Commit, "unknown"),
-		defaultString(command.dependencies.Version.Date, "unknown"),
-	))
+	root.SetVersionTemplate(command.dependencies.Version.display() + "\n")
 
 	root.AddGroup(
 		&cobra.Group{ID: "account", Title: "Account and Context:"},

@@ -289,7 +289,6 @@ The test suite uses loopback-only HTTP servers to verify PKCE callback handling,
 token rotation, authenticated retries, URL/query construction, app resolution,
 and CLI output. No external service is required.
 
-
 ## Private application networking
 
 You can connect to your Infrastry team's private network and resolve private addresses. 

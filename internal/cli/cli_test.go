@@ -25,6 +25,32 @@ func (roundTrip roundTripFunc) RoundTrip(request *http.Request) (*http.Response,
 	return roundTrip(request)
 }
 
+func TestVersionShowsAvailableReleaseInformation(t *testing.T) {
+	tests := []struct {
+		name    string
+		version Version
+		want    string
+	}{
+		{"release binary", Version{Version: "1.2.3", Commit: "abc123", Date: "2026-09-25T12:00:00Z"}, "infra 1.2.3 (commit abc123, built 2026-09-25T12:00:00Z)\n"},
+		{"source build", Version{Version: "1.2.3", Commit: "unknown", Date: "unknown"}, "infra 1.2.3\n"},
+		{"local build", Version{}, "infra dev\n"},
+	}
+	for _, test := range tests {
+		for _, argument := range []string{"version", "--version"} {
+			t.Run(test.name+"/"+argument, func(t *testing.T) {
+				var stdout, stderr bytes.Buffer
+				command := New(Dependencies{Stdout: &stdout, Stderr: &stderr, Version: test.version})
+				if code := command.Run(t.Context(), []string{argument}); code != 0 {
+					t.Fatalf("exit code = %d, stderr = %q", code, stderr.String())
+				}
+				if got := stdout.String(); got != test.want {
+					t.Fatalf("output = %q, want %q", got, test.want)
+				}
+			})
+		}
+	}
+}
+
 func TestLogsAllowsFlagsAfterApplicationAndPrintsOnePage(t *testing.T) {
 	now := time.Date(2026, 8, 17, 12, 0, 0, 0, time.UTC)
 	server := httptest.NewServer(http.HandlerFunc(func(writer http.ResponseWriter, request *http.Request) {
