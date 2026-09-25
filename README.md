@@ -384,4 +384,3 @@ On macOS, `Connected` is printed only after the system has loaded the applicatio
 private DNS configuration and every service name resolves to its authorized
 address. Setup waits up to 30 seconds; if DNS cannot become ready, the helper
 removes its routes and resolver before the command reports failure.
-
